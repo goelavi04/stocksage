@@ -1,13 +1,16 @@
 from fastapi import FastAPI
+from backend.routes.stock import router as stock_router
 
-# Create the FastAPI application instance
 app = FastAPI(
     title="StockSage API",
     description="AI-Powered Investment & Learning Platform for Indian Stock Market",
     version="1.0.0"
 )
 
-# Root endpoint — the "hello world" of our API
+# Connect the stock router to the main app
+app.include_router(stock_router)
+
+
 @app.get("/")
 def read_root():
     return {
@@ -16,7 +19,7 @@ def read_root():
         "version": "1.0.0"
     }
 
-# Health check endpoint — used to verify the server is alive
+
 @app.get("/health")
 def health_check():
     return {

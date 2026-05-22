@@ -1,6 +1,21 @@
+# Virtual environment
 venv/
+
+# Environment variables — never commit secrets
 .env
+
+# Python cache files
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+
+# Placeholder files
+.gitkeep
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/

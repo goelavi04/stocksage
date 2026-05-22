@@ -68,3 +68,23 @@ def get_technical_indicators(symbol: str):
         )
 
     return data
+from backend.services.fundamentals import fetch_fundamental_data
+
+@router.get("/{symbol}/fundamentals")
+def get_fundamentals(symbol: str):
+    """
+    Get fundamental financial data for any NSE stock.
+    PE ratio, EPS, debt, ROE, margins and more.
+
+    Example: GET /stock/TCS/fundamentals
+    Example: GET /stock/HDFCBANK/fundamentals
+    """
+    data = fetch_fundamental_data(symbol)
+
+    if data is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Could not fetch fundamentals for '{symbol}'."
+        )
+
+    return data

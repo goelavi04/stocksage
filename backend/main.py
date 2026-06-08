@@ -1,21 +1,38 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from backend.database import engine
 from backend.models import portfolio as portfolio_models
 from backend.routes.stock import router as stock_router
 from backend.routes.portfolio import router as portfolio_router
+from backend.routes.news import router as news_router
+from backend.routes.alerts import router as alerts_router
+from backend.services.scheduler import start_scheduler, stop_scheduler
 
 # Create all database tables on startup
 portfolio_models.Base.metadata.create_all(bind=engine)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Starting StockSage API...")
+    start_scheduler()
+    yield
+    stop_scheduler()
+    print("StockSage API stopped")
+
+
 app = FastAPI(
     title="StockSage API",
     description="AI-Powered Investment & Learning Platform for Indian Stock Market",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
-# Connect routers
+# Connect all routers
 app.include_router(stock_router)
 app.include_router(portfolio_router)
+app.include_router(news_router)
+app.include_router(alerts_router)
 
 
 @app.get("/")

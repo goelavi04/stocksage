@@ -255,3 +255,115 @@ def delete_sip(sip_id: int, db: Session = Depends(get_db)):
     return {
         "message": f"{sip.fund_name} SIP removed successfully"
     }
+from backend.services.recommender import generate_recommendation
+
+@router.get("/analyse")
+def analyse_portfolio(db: Session = Depends(get_db)):
+    """
+    Runs Buy/Hold/Sell recommendation on ALL your holdings at once.
+    Gives you a complete portfolio action plan.
+    """
+    holdings = db.query(Portfolio).all()
+
+    if not holdings:
+        return {"message": "Portfolio is empty. Add holdings first."}
+
+    portfolio_analysis = []
+    urgent_actions = []
+    total_invested = 0
+    current_value = 0
+
+    for holding in holdings:
+        # Get current price and P&L
+        quote = fetch_stock_quote(holding.symbol)
+        current_price = quote["current_price"] if quote else holding.buy_price
+
+        invested = holding.invested_amount
+        current = round(current_price * holding.quantity, 2)
+        pnl = round(current - invested, 2)
+        pnl_percent = round((pnl / invested) * 100, 2)
+
+        total_invested += invested
+        current_value += current
+
+        # Get recommendation for this stock
+        recommendation = generate_recommendation(holding.symbol)
+        signal = recommendation["recommendation"]["signal"] if recommendation else "UNAVAILABLE"
+        score = recommendation["recommendation"]["final_score"] if recommendation else 0
+        father_mode = recommendation["father_mode"] if recommendation else {}
+
+        # Flag urgent actions
+        if signal in ["SELL / AVOID"] or pnl_percent < -20:
+            urgency = "🔴 URGENT"
+        elif signal == "STRONG BUY" or pnl_percent > 20:
+            urgency = "🟢 OPPORTUNITY"
+        elif signal == "BUY":
+            urgency = "🟢 POSITIVE"
+        elif signal == "WATCH":
+            urgency = "🟠 WATCH"
+        else:
+            urgency = "🟡 HOLD"
+
+        item = {
+            "symbol": holding.symbol,
+            "company_name": holding.company_name,
+            "quantity": holding.quantity,
+            "buy_price": holding.buy_price,
+            "current_price": current_price,
+            "invested": invested,
+            "current_value": current,
+            "pnl": pnl,
+            "pnl_percent": pnl_percent,
+            "signal": signal,
+            "score": score,
+            "urgency": urgency,
+            "father_explanation": father_mode.get("simple_explanation", ""),
+            "action": father_mode.get("action", "")
+        }
+
+        portfolio_analysis.append(item)
+
+        # Collect urgent items separately
+        if urgency in ["🔴 URGENT", "🟢 OPPORTUNITY"]:
+            urgent_actions.append({
+                "symbol": holding.symbol,
+                "urgency": urgency,
+                "signal": signal,
+                "pnl_percent": pnl_percent,
+                "action": father_mode.get("action", "")
+            })
+
+    # Sort by urgency — most important first
+    portfolio_analysis.sort(key=lambda x: x["score"])
+
+    # Overall portfolio health
+    total_pnl = round(current_value - total_invested, 2)
+    total_pnl_percent = round((total_pnl / total_invested) * 100, 2)
+
+    if total_pnl_percent > 10:
+        portfolio_health = "🟢 Healthy — portfolio performing well"
+    elif total_pnl_percent > 0:
+        portfolio_health = "🟡 Neutral — small overall gain"
+    elif total_pnl_percent > -10:
+        portfolio_health = "🟠 Caution — portfolio slightly down"
+    else:
+        portfolio_health = "🔴 Review needed — portfolio significantly down"
+
+    # Father mode overall summary
+    if total_pnl >= 0:
+        father_summary = f"Aapka portfolio abhi ₹{abs(total_pnl)} upar hai. Achha chal raha hai! 😊"
+    else:
+        father_summary = f"Aapka portfolio abhi ₹{abs(total_pnl)} neeche hai. Ghabrao mat — market cycle hota hai. 💪"
+
+    return {
+        "portfolio_health": portfolio_health,
+        "summary": {
+            "total_invested": round(total_invested, 2),
+            "current_value": round(current_value, 2),
+            "total_pnl": total_pnl,
+            "total_pnl_percent": total_pnl_percent,
+            "father_summary": father_summary
+        },
+        "urgent_actions": urgent_actions,
+        "holdings_analysis": portfolio_analysis
+    }

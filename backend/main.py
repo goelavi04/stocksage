@@ -1,5 +1,11 @@
 from fastapi import FastAPI
+from backend.database import engine
+from backend.models import portfolio as portfolio_models
 from backend.routes.stock import router as stock_router
+from backend.routes.portfolio import router as portfolio_router
+
+# Create all database tables on startup
+portfolio_models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="StockSage API",
@@ -7,8 +13,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Connect the stock router to the main app
+# Connect routers
 app.include_router(stock_router)
+app.include_router(portfolio_router)
 
 
 @app.get("/")

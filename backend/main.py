@@ -7,6 +7,7 @@ from backend.routes.portfolio import router as portfolio_router
 from backend.routes.news import router as news_router
 from backend.routes.alerts import router as alerts_router
 from backend.routes.recommendations import router as recommendations_router
+from backend.routes.chat import router as chat_router
 from backend.services.scheduler import start_scheduler, stop_scheduler
 
 # Create all database tables on startup
@@ -35,6 +36,7 @@ app.include_router(portfolio_router)
 app.include_router(news_router)
 app.include_router(alerts_router)
 app.include_router(recommendations_router)
+app.include_router(chat_router)
 
 
 @app.get("/")

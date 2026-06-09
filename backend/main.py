@@ -6,6 +6,7 @@ from backend.routes.stock import router as stock_router
 from backend.routes.portfolio import router as portfolio_router
 from backend.routes.news import router as news_router
 from backend.routes.alerts import router as alerts_router
+from backend.routes.recommendations import router as recommendations_router
 from backend.services.scheduler import start_scheduler, stop_scheduler
 
 # Create all database tables on startup
@@ -33,13 +34,14 @@ app.include_router(stock_router)
 app.include_router(portfolio_router)
 app.include_router(news_router)
 app.include_router(alerts_router)
+app.include_router(recommendations_router)
 
 
 @app.get("/")
 def read_root():
     return {
         "message": "Welcome to StockSage API",
-        "status": "running",
+        "status" : "running",
         "version": "1.0.0"
     }
 
@@ -47,6 +49,6 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {
-        "status": "healthy",
+        "status" : "healthy",
         "service": "StockSage Backend"
     }

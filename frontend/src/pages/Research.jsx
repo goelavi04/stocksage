@@ -2,11 +2,10 @@ import { useState, useEffect, useRef } from "react"
 import { createChart, LineSeries } from "lightweight-charts"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import Header from "../components/layout/Header"
 import {
   Search,
   X,
-  Bell,
-  User,
   LineChart,
   Sparkles,
   Loader2,
@@ -62,7 +61,6 @@ function BottomNav({ active = "Research" }) {
           return (
             <button
               key={item.label}
-              type="button"
               onClick={() => navigate(item.path)}
               className={`flex flex-1 flex-col items-center gap-1 rounded-lg py-1.5 transition-colors ${
                 isActive ? "text-blue-500" : "text-gray-500 hover:text-gray-50"
@@ -94,44 +92,28 @@ function StockChart({ chartData, activePeriod, setActivePeriod }) {
     const width = container.offsetWidth || 350
 
     const chart = createChart(container, {
-      layout: {
-        background: { color: "#0a0f1e" },
-        textColor: "#6B7280",
-      },
-      grid: {
-        vertLines: { color: "#1f2937" },
-        horzLines: { color: "#1f2937" },
-      },
-      width: width,
+      layout: { background: { color: "#0a0f1e" }, textColor: "#6B7280" },
+      grid: { vertLines: { color: "#1f2937" }, horzLines: { color: "#1f2937" } },
+      width,
       height: 200,
       timeScale: { borderColor: "#1f2937" },
       rightPriceScale: { borderColor: "#1f2937" },
-      crosshair: {
-        vertLine: { color: "#3B82F6" },
-        horzLine: { color: "#3B82F6" },
-      },
+      crosshair: { vertLine: { color: "#3B82F6" }, horzLine: { color: "#3B82F6" } },
       handleScroll: true,
       handleScale: true,
     })
 
-    const series = chart.addSeries(LineSeries, {
-      color: "#3B82F6",
-      lineWidth: 2,
-    })
-
+    const series = chart.addSeries(LineSeries, { color: "#3B82F6", lineWidth: 2 })
     series.setData(chartData)
     chart.timeScale().fitContent()
     chartRef.current = chart
 
     const onResize = () => {
       if (containerRef.current && chartRef.current) {
-        chartRef.current.applyOptions({
-          width: containerRef.current.offsetWidth,
-        })
+        chartRef.current.applyOptions({ width: containerRef.current.offsetWidth })
       }
     }
     window.addEventListener("resize", onResize)
-
     return () => {
       window.removeEventListener("resize", onResize)
       if (chartRef.current) {
@@ -149,9 +131,7 @@ function StockChart({ chartData, activePeriod, setActivePeriod }) {
             key={p}
             onClick={() => setActivePeriod(p)}
             className={`flex-1 rounded-lg py-1.5 font-mono text-xs font-semibold transition-colors ${
-              activePeriod === p
-                ? "bg-blue-500 text-gray-50"
-                : "text-gray-500 hover:bg-[#1f2937] hover:text-gray-50"
+              activePeriod === p ? "bg-blue-500 text-gray-50" : "text-gray-500 hover:bg-[#1f2937] hover:text-gray-50"
             }`}
           >
             {p}
@@ -165,11 +145,7 @@ function StockChart({ chartData, activePeriod, setActivePeriod }) {
             Loading chart...
           </div>
         ) : (
-          <div
-            ref={containerRef}
-            className="w-full rounded-xl overflow-hidden"
-            style={{ height: "200px" }}
-          />
+          <div ref={containerRef} className="w-full rounded-xl overflow-hidden" style={{ height: "200px" }} />
         )}
       </div>
     </section>
@@ -181,7 +157,6 @@ export default function ResearchPage() {
   const [activePeriod, setActivePeriod] = useState("1Y")
   const [symbol, setSymbol] = useState("TCS")
   const [loading, setLoading] = useState(true)
-
   const [chartData, setChartData] = useState([])
   const [quote, setQuote] = useState(null)
   const [indicators, setIndicators] = useState(null)
@@ -221,10 +196,7 @@ export default function ResearchPage() {
       const res = await axios.get(
         `http://127.0.0.1:8000/stock/${sym}/history?period=${PERIOD_MAP[period]}`
       )
-      const data = res.data.data.map((item) => ({
-        time: item.date,
-        value: item.close,
-      }))
+      const data = res.data.data.map((item) => ({ time: item.date, value: item.close }))
       setChartData(data)
     } catch (e) {
       console.error("Chart fetch error:", e)
@@ -253,14 +225,10 @@ export default function ResearchPage() {
   const generateAnalysis = async () => {
     setAiState("loading")
     try {
-      const res = await axios.get(
-        `http://127.0.0.1:8000/chat/analyse/${symbol}`,
-        { timeout: 60000 }
-      )
+      const res = await axios.get(`http://127.0.0.1:8000/chat/analyse/${symbol}`, { timeout: 60000 })
       setAiAnalysis(res.data.analysis)
       setAiState("done")
     } catch (error) {
-      console.error("AI error:", error.message)
       setAiAnalysis("Failed to generate analysis. Please try again.")
       setAiState("done")
     }
@@ -277,29 +245,10 @@ export default function ResearchPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-md bg-[#0a0f1e] text-gray-50">
-
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#1f2937] bg-[#0a0f1e]/90 px-4 py-3 backdrop-blur-md">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500">
-            <TrendingUp className="h-5 w-5 text-gray-50" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-gray-50">
-            StockSage
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-[#1f2937] hover:text-gray-50">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-red-500" />
-          </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1f2937] text-gray-50">
-            <User className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
-
+      <Header title="Research" />
       <div className="flex flex-col gap-5 px-4 pb-28 pt-4">
 
+        {/* Search */}
         <section>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
@@ -312,10 +261,7 @@ export default function ResearchPage() {
               className="w-full rounded-2xl border border-[#1f2937] bg-[#111827] py-3 pl-11 pr-11 text-sm text-gray-50 placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
             />
             {query && (
-              <button
-                onClick={() => setQuery("")}
-                className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 hover:text-gray-50"
-              >
+              <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-gray-500 hover:text-gray-50">
                 <X className="h-4 w-4" />
               </button>
             )}
@@ -323,17 +269,14 @@ export default function ResearchPage() {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-xs text-gray-500">Recent</span>
             {RECENT_SEARCHES.map((s) => (
-              <button
-                key={s}
-                onClick={() => handleSearch(s)}
-                className="rounded-full border border-[#1f2937] bg-[#111827] px-3 py-1 font-mono text-xs font-medium text-gray-50 hover:border-blue-500 hover:text-blue-500"
-              >
+              <button key={s} onClick={() => handleSearch(s)} className="rounded-full border border-[#1f2937] bg-[#111827] px-3 py-1 font-mono text-xs font-medium text-gray-50 hover:border-blue-500 hover:text-blue-500">
                 {s}
               </button>
             ))}
           </div>
         </section>
 
+        {/* Stock Header */}
         {loading ? (
           <div className="h-36 animate-pulse rounded-2xl bg-[#111827]" />
         ) : quote ? (
@@ -342,23 +285,17 @@ export default function ResearchPage() {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl font-bold tracking-tight text-gray-50">
-                    {symbol}
-                  </h1>
+                  <h1 className="text-2xl font-bold tracking-tight text-gray-50">{symbol}</h1>
                   {signal && (
                     <span className={`rounded-md px-2 py-0.5 font-mono text-[11px] font-semibold tracking-wide ${SIGNAL_STYLES[signal] || "bg-gray-800 text-gray-500"}`}>
                       {signal}
                     </span>
                   )}
                 </div>
-                <p className="mt-0.5 truncate text-sm text-gray-500">
-                  {quote.company_name}
-                </p>
+                <p className="mt-0.5 truncate text-sm text-gray-500">{quote.company_name}</p>
               </div>
               <div className="shrink-0 text-right">
-                <p className="font-mono text-2xl font-semibold text-gray-50">
-                  ₹{quote.current_price?.toLocaleString("en-IN")}
-                </p>
+                <p className="font-mono text-2xl font-semibold text-gray-50">₹{quote.current_price?.toLocaleString("en-IN")}</p>
                 <p className={`mt-0.5 font-mono text-sm ${quote.change >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                   {quote.change >= 0 ? "+" : ""}₹{quote.change} ({quote.percent_change}%)
                 </p>
@@ -380,12 +317,10 @@ export default function ResearchPage() {
           </section>
         ) : null}
 
-        <StockChart
-          chartData={chartData}
-          activePeriod={activePeriod}
-          setActivePeriod={setActivePeriod}
-        />
+        {/* Chart */}
+        <StockChart chartData={chartData} activePeriod={activePeriod} setActivePeriod={setActivePeriod} />
 
+        {/* Technical Indicators */}
         {indicators && (
           <section>
             <h2 className="mb-3 text-lg font-bold text-gray-50">Technical Indicators</h2>
@@ -393,11 +328,7 @@ export default function ResearchPage() {
               <div className="rounded-2xl border border-[#1f2937] bg-[#111827] p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-gray-50">RSI (14)</p>
-                  <span className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
-                    rsi?.value < 35 ? "bg-emerald-500/15 text-emerald-500"
-                    : rsi?.value > 70 ? "bg-red-500/15 text-red-500"
-                    : "bg-[#1f2937] text-gray-500"
-                  }`}>
+                  <span className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${rsi?.value < 35 ? "bg-emerald-500/15 text-emerald-500" : rsi?.value > 70 ? "bg-red-500/15 text-red-500" : "bg-[#1f2937] text-gray-500"}`}>
                     {rsi?.value < 35 ? "OVERSOLD" : rsi?.value > 70 ? "OVERBOUGHT" : "NEUTRAL"}
                   </span>
                 </div>
@@ -408,18 +339,12 @@ export default function ResearchPage() {
               <div className="rounded-2xl border border-[#1f2937] bg-[#111827] p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-gray-50">Moving Avg</p>
-                  <span className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
-                    ma?.signal?.includes("Bullish") ? "bg-emerald-500/15 text-emerald-500" : "bg-red-500/15 text-red-500"
-                  }`}>
+                  <span className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${ma?.signal?.includes("Bullish") ? "bg-emerald-500/15 text-emerald-500" : "bg-red-500/15 text-red-500"}`}>
                     {ma?.signal?.includes("Bullish") ? "BULLISH" : "BEARISH"}
                   </span>
                 </div>
                 <div className="mt-2.5 flex flex-col gap-1.5">
-                  {[
-                    { label: "MA20", value: ma?.ma20 },
-                    { label: "MA50", value: ma?.ma50 },
-                    { label: "MA200", value: ma?.ma200 },
-                  ].map((item) => (
+                  {[{ label: "MA20", value: ma?.ma20 }, { label: "MA50", value: ma?.ma50 }, { label: "MA200", value: ma?.ma200 }].map((item) => (
                     <div key={item.label} className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">{item.label}</span>
                       <span className="font-mono text-xs font-medium text-gray-50">₹{item.value?.toLocaleString("en-IN")}</span>
@@ -431,15 +356,11 @@ export default function ResearchPage() {
               <div className="rounded-2xl border border-[#1f2937] bg-[#111827] p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium text-gray-50">MACD</p>
-                  <span className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
-                    macd?.signal?.includes("Bullish") ? "bg-emerald-500/15 text-emerald-500" : "bg-red-500/15 text-red-500"
-                  }`}>
+                  <span className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-semibold ${macd?.signal?.includes("Bullish") ? "bg-emerald-500/15 text-emerald-500" : "bg-red-500/15 text-red-500"}`}>
                     {macd?.signal?.includes("Bullish") ? "BULLISH" : "BEARISH"}
                   </span>
                 </div>
-                <p className={`mt-2 font-mono text-2xl font-semibold ${macd?.macd >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                  {macd?.macd}
-                </p>
+                <p className={`mt-2 font-mono text-2xl font-semibold ${macd?.macd >= 0 ? "text-emerald-500" : "text-red-500"}`}>{macd?.macd}</p>
                 <p className="mt-1 font-mono text-xs text-gray-500">Signal: {macd?.signal_line}</p>
               </div>
 
@@ -451,10 +372,7 @@ export default function ResearchPage() {
                   </span>
                 </div>
                 <div className="mt-2.5 flex flex-col gap-1.5">
-                  {[
-                    { label: "Upper", value: bb?.upper },
-                    { label: "Lower", value: bb?.lower },
-                  ].map((item) => (
+                  {[{ label: "Upper", value: bb?.upper }, { label: "Lower", value: bb?.lower }].map((item) => (
                     <div key={item.label} className="flex items-center justify-between">
                       <span className="text-xs text-gray-500">{item.label}</span>
                       <span className="font-mono text-xs font-medium text-gray-50">₹{item.value?.toLocaleString("en-IN")}</span>
@@ -466,6 +384,7 @@ export default function ResearchPage() {
           </section>
         )}
 
+        {/* Fundamentals */}
         {fundamentals && (
           <section>
             <h2 className="mb-3 text-lg font-bold text-gray-50">Fundamentals</h2>
@@ -494,19 +413,15 @@ export default function ResearchPage() {
           </section>
         )}
 
+        {/* AI Analysis */}
         <section className="overflow-hidden rounded-2xl border border-l-[3px] border-[#1f2937] border-l-blue-500 bg-[#111827] p-4">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-blue-500" />
             <h2 className="text-lg font-bold text-gray-50">AI Analysis</h2>
-            <span className="rounded-md bg-[#1f2937] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-500">
-              Powered by Groq
-            </span>
+            <span className="rounded-md bg-[#1f2937] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-gray-500">Powered by Groq</span>
           </div>
           {aiState === "idle" && (
-            <button
-              onClick={generateAnalysis}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-2.5 text-sm font-semibold text-gray-50 hover:opacity-90"
-            >
+            <button onClick={generateAnalysis} className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-500 py-2.5 text-sm font-semibold text-gray-50 hover:opacity-90">
               <Sparkles className="h-4 w-4" />
               Generate Analysis
             </button>
@@ -520,13 +435,12 @@ export default function ResearchPage() {
           {aiState === "done" && (
             <div>
               <p className="mt-3 text-sm leading-relaxed text-gray-400">{aiAnalysis}</p>
-              <button onClick={() => setAiState("idle")} className="mt-2 text-xs text-blue-500 hover:underline">
-                Regenerate
-              </button>
+              <button onClick={() => setAiState("idle")} className="mt-2 text-xs text-blue-500 hover:underline">Regenerate</button>
             </div>
           )}
         </section>
 
+        {/* News */}
         <section>
           <h2 className="mb-3 text-lg font-bold text-gray-50">Recent News</h2>
           <div className="overflow-hidden rounded-2xl border border-[#1f2937] bg-[#111827]">
@@ -552,7 +466,6 @@ export default function ResearchPage() {
         </section>
 
       </div>
-
       <BottomNav active="Research" />
     </main>
   )

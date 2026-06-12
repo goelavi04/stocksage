@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import Header from "../components/layout/Header"
 import {
-  Bell,
-  User,
   Send,
   Sparkles,
   Loader2,
-  TrendingUp,
   LayoutDashboard,
+  TrendingUp,
   Briefcase,
   MessageCircle,
   MoreHorizontal,
@@ -27,7 +26,7 @@ const SUGGESTED_QUESTIONS = [
   "Is now a good time to buy TCS?",
   "How is my portfolio performing overall?",
   "Which stock in my portfolio needs attention?",
-  "Should I add more to my SIP amount?",
+  "Should I increase my SIP amount?",
   "Explain RSI to me in simple terms",
   "What is the difference between large cap and mid cap?",
   "How does SIP compounding work?",
@@ -82,7 +81,6 @@ export default function ChatPage() {
 
     setInput("")
 
-    // Add user message
     const userMsg = {
       role: "user",
       content: message,
@@ -92,7 +90,6 @@ export default function ChatPage() {
     setLoading(true)
 
     try {
-      // Build history for context
       const history = messages.slice(-6).map((m) => ({
         role: m.role,
         content: m.content,
@@ -100,11 +97,7 @@ export default function ChatPage() {
 
       const res = await axios.post(
         "http://127.0.0.1:8000/chat/message",
-        {
-          message,
-          father_mode: false,
-          history,
-        },
+        { message, father_mode: false, history },
         { timeout: 60000 }
       )
 
@@ -136,34 +129,7 @@ export default function ChatPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col bg-[#0a0f1e] text-gray-50">
-
-      {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#1f2937] bg-[#0a0f1e]/90 px-4 py-3 backdrop-blur-md">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500">
-            <TrendingUp className="h-5 w-5 text-gray-50" />
-          </div>
-          <div>
-            <span className="text-lg font-bold tracking-tight text-gray-50">StockSage AI</span>
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              </span>
-              <span className="text-[10px] text-emerald-500">Online · Powered by Groq</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-[#1f2937]">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-red-500" />
-          </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1f2937] text-gray-50">
-            <User className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
+      <Header title="StockSage AI" />
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 pb-48 space-y-4">
@@ -191,14 +157,12 @@ export default function ChatPage() {
             key={i}
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
-            {/* AI Avatar */}
             {msg.role === "assistant" && (
               <div className="mr-2 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500">
                 <Sparkles className="h-3.5 w-3.5 text-white" />
               </div>
             )}
-
-            <div className={`max-w-[80%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col`}>
+            <div className={`max-w-[80%] flex flex-col ${msg.role === "user" ? "items-end" : "items-start"}`}>
               <div
                 className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                   msg.role === "user"
@@ -218,7 +182,6 @@ export default function ChatPage() {
           </div>
         ))}
 
-        {/* Loading indicator */}
         {loading && (
           <div className="flex justify-start">
             <div className="mr-2 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500">
@@ -236,10 +199,10 @@ export default function ChatPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested questions when mid conversation */}
+      {/* Mid conversation suggestions */}
       {messages.length > 1 && messages.length < 6 && (
         <div className="fixed bottom-24 left-0 right-0 mx-auto max-w-md px-4">
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {SUGGESTED_QUESTIONS.slice(4).map((q, i) => (
               <button
                 key={i}

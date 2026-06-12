@@ -3,6 +3,9 @@ import DashboardPage from './pages/Dashboard'
 import ResearchPage from './pages/Research'
 import PortfolioPage from './pages/Portfolio'
 import ChatPage from './pages/Chat'
+import InvestmentsPage from './pages/Investments'
+import AlertsPage from './pages/Alerts'
+import MorePage from './pages/More'
 
 function App() {
   return (
@@ -12,9 +15,9 @@ function App() {
       <Route path="/research" element={<ResearchPage />} />
       <Route path="/portfolio" element={<PortfolioPage />} />
       <Route path="/chat" element={<ChatPage />} />
-      <Route path="/investments" element={<div className="min-h-screen bg-[#0a0f1e] text-white p-4">Investments</div>} />
-      <Route path="/alerts" element={<div className="min-h-screen bg-[#0a0f1e] text-white p-4">Alerts</div>} />
-      <Route path="/more" element={<div className="min-h-screen bg-[#0a0f1e] text-white p-4">More</div>} />
+      <Route path="/investments" element={<InvestmentsPage />} />
+      <Route path="/alerts" element={<AlertsPage />} />
+      <Route path="/more" element={<MorePage />} />
     </Routes>
   )
 }

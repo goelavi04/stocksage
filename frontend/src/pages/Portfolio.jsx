@@ -1,9 +1,8 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import Header from "../components/layout/Header"
 import {
-  Bell,
-  User,
   Plus,
   ChevronRight,
   TrendingUp,
@@ -24,7 +23,6 @@ const NAV_ITEMS = [
   { label: "More", icon: MoreHorizontal, path: "/more" },
 ]
 
-// ── Complete NSE Stock Universe ──────────────────────
 const NSE_STOCKS = [
   { symbol: "RELIANCE", name: "Reliance Industries" },
   { symbol: "TCS", name: "Tata Consultancy Services" },
@@ -64,7 +62,6 @@ const NSE_STOCKS = [
   { symbol: "HEROMOTOCO", name: "Hero MotoCorp" },
   { symbol: "HINDALCO", name: "Hindalco Industries" },
   { symbol: "INDUSINDBK", name: "IndusInd Bank" },
-  { symbol: "M&M", name: "Mahindra & Mahindra" },
   { symbol: "CIPLA", name: "Cipla" },
   { symbol: "COALINDIA", name: "Coal India" },
   { symbol: "BPCL", name: "Bharat Petroleum" },
@@ -84,7 +81,6 @@ const NSE_STOCKS = [
   { symbol: "NYKAA", name: "FSN E-Commerce (Nykaa)" },
   { symbol: "ZOMATO", name: "Eternal (Zomato)" },
   { symbol: "PAYTM", name: "One97 Communications (Paytm)" },
-  { symbol: "POLICYBZR", name: "PB Fintech (Policybazaar)" },
   { symbol: "IRCTC", name: "Indian Railway Catering" },
   { symbol: "IRFC", name: "Indian Railway Finance Corp" },
   { symbol: "JIOFIN", name: "Jio Financial Services" },
@@ -92,69 +88,38 @@ const NSE_STOCKS = [
   { symbol: "YESBANK", name: "Yes Bank" },
   { symbol: "SUZLON", name: "Suzlon Energy" },
   { symbol: "NHPC", name: "NHPC" },
-  { symbol: "SJVN", name: "SJVN" },
   { symbol: "RECLTD", name: "REC Limited" },
   { symbol: "PFC", name: "Power Finance Corporation" },
   { symbol: "BANKBARODA", name: "Bank of Baroda" },
   { symbol: "CANBK", name: "Canara Bank" },
   { symbol: "PNB", name: "Punjab National Bank" },
-  { symbol: "UNIONBANK", name: "Union Bank of India" },
   { symbol: "FEDERALBNK", name: "Federal Bank" },
   { symbol: "IDFCFIRSTB", name: "IDFC First Bank" },
   { symbol: "BANDHANBNK", name: "Bandhan Bank" },
-  { symbol: "RBLBANK", name: "RBL Bank" },
   { symbol: "AUBANK", name: "AU Small Finance Bank" },
   { symbol: "CHOLAFIN", name: "Cholamandalam Investment" },
   { symbol: "MUTHOOTFIN", name: "Muthoot Finance" },
-  { symbol: "BAJAJHLDNG", name: "Bajaj Holdings" },
   { symbol: "HDFCLIFE", name: "HDFC Life Insurance" },
   { symbol: "SBILIFE", name: "SBI Life Insurance" },
-  { symbol: "ICICIlombard", name: "ICICI Lombard" },
   { symbol: "LICI", name: "Life Insurance Corp of India" },
   { symbol: "NIFTYBEES", name: "Nippon Nifty BeES ETF" },
   { symbol: "GOLDBEES", name: "Nippon Gold BeES ETF" },
-  { symbol: "BANKBEES", name: "Nippon Bank BeES ETF" },
-  { symbol: "ITBEES", name: "Nippon IT BeES ETF" },
-  { symbol: "JUNIORBEES", name: "Nippon Junior BeES ETF" },
-  { symbol: "HDFCNIFTY", name: "HDFC Nifty 50 ETF" },
-  { symbol: "ICICIB22", name: "ICICI Prudential Nifty ETF" },
   { symbol: "APOLLOHOSP", name: "Apollo Hospitals" },
-  { symbol: "FORTIS", name: "Fortis Healthcare" },
-  { symbol: "MAXHEALTH", name: "Max Healthcare" },
   { symbol: "TATAPOWER", name: "Tata Power" },
   { symbol: "ADANIGREEN", name: "Adani Green Energy" },
-  { symbol: "ADANITRANS", name: "Adani Transmission" },
-  { symbol: "TORNTPOWER", name: "Torrent Power" },
-  { symbol: "CESC", name: "CESC" },
   { symbol: "OFSS", name: "Oracle Financial Services" },
   { symbol: "MPHASIS", name: "Mphasis" },
   { symbol: "LTIM", name: "LTIMindtree" },
   { symbol: "PERSISTENT", name: "Persistent Systems" },
   { symbol: "COFORGE", name: "Coforge" },
-  { symbol: "KPITTECH", name: "KPIT Technologies" },
-  { symbol: "TANLA", name: "Tanla Platforms" },
-  { symbol: "ZENSARTECH", name: "Zensar Technologies" },
-  { symbol: "INFY", name: "Infosys" },
-  { symbol: "INDIAMART", name: "IndiaMART InterMESH" },
-  { symbol: "JUSTDIAL", name: "Just Dial" },
-  { symbol: "MATRIMONY", name: "Matrimony.com" },
-  { symbol: "CARYSIL", name: "Carysil" },
   { symbol: "TATACHEM", name: "Tata Chemicals" },
   { symbol: "UPL", name: "UPL" },
   { symbol: "PIIND", name: "PI Industries" },
-  { symbol: "RALLIS", name: "Rallis India" },
-  { symbol: "AAVAS", name: "Aavas Financiers" },
-  { symbol: "HOMEFIRST", name: "Home First Finance" },
-  { symbol: "APTUS", name: "Aptus Value Housing" },
   { symbol: "CANFINHOME", name: "Can Fin Homes" },
   { symbol: "LICHSGFIN", name: "LIC Housing Finance" },
-  { symbol: "PNBHOUSING", name: "PNB Housing Finance" },
-  { symbol: "REPCO", name: "Repco Home Finance" },
 ]
 
-// ── Complete Mutual Fund Universe ────────────────────
 const MUTUAL_FUNDS = [
-  // Large Cap
   "Mirae Asset Large Cap Fund Direct Growth",
   "Axis Bluechip Fund Direct Growth",
   "HDFC Top 100 Fund Direct Growth",
@@ -162,142 +127,67 @@ const MUTUAL_FUNDS = [
   "Nippon India Large Cap Fund Direct Growth",
   "ICICI Prudential Bluechip Fund Direct Growth",
   "Kotak Bluechip Fund Direct Growth",
-  "Franklin India Bluechip Fund Direct Growth",
   "Canara Robeco Bluechip Equity Fund Direct Growth",
-  "UTI Master Share Fund Direct Growth",
-  "DSP Top 100 Equity Fund Direct Growth",
-  "Tata Large Cap Fund Direct Growth",
-  "Invesco India Largecap Fund Direct Growth",
-
-  // Mid Cap
   "Kotak Emerging Equity Fund Direct Growth",
   "Edelweiss Mid Cap Fund Direct Growth",
   "Invesco India Mid Cap Fund Direct Growth",
   "HDFC Mid Cap Opportunities Fund Direct Growth",
   "Nippon India Growth Fund Direct Growth",
-  "Franklin India Prima Fund Direct Growth",
   "Axis Midcap Fund Direct Growth",
   "DSP Mid Cap Fund Direct Growth",
   "SBI Magnum Midcap Fund Direct Growth",
-  "Tata Mid Cap Growth Fund Direct Growth",
-  "PGIM India Midcap Opportunities Fund Direct Growth",
-  "Sundaram Mid Cap Fund Direct Growth",
-  "UTI Mid Cap Fund Direct Growth",
   "Motilal Oswal Midcap Fund Direct Growth",
-
-  // Small Cap
   "Quant Small Cap Fund Direct Growth",
   "Axis Small Cap Fund Direct Growth",
   "Nippon India Small Cap Fund Direct Growth",
   "SBI Small Cap Fund Direct Growth",
   "HDFC Small Cap Fund Direct Growth",
   "Kotak Small Cap Fund Direct Growth",
-  "DSP Small Cap Fund Direct Growth",
-  "ICICI Prudential Smallcap Fund Direct Growth",
-  "Franklin India Smaller Companies Fund Direct Growth",
-  "Canara Robeco Small Cap Fund Direct Growth",
-  "Union Small Cap Fund Direct Growth",
-  "Tata Small Cap Fund Direct Growth",
-
-  // Multi Cap
   "Nippon India Multi Cap Fund Direct Growth",
   "Quant Active Fund Direct Growth",
-  "Mahindra Manulife Multi Cap Fund Direct Growth",
   "HDFC Multi Cap Fund Direct Growth",
-  "Baroda BNP Paribas Multi Cap Fund Direct Growth",
-  "ITI Multi Cap Fund Direct Growth",
-  "Sundaram Multi Cap Fund Direct Growth",
-
-  // Flexi Cap
   "Parag Parikh Flexi Cap Fund Direct Growth",
   "Canara Robeco Flexi Cap Fund Direct Growth",
-  "PGIM India Flexi Cap Fund Direct Growth",
-  "Axis Flexi Cap Fund Direct Growth",
   "HDFC Flexi Cap Fund Direct Growth",
   "Kotak Flexicap Fund Direct Growth",
-  "DSP Flexi Cap Fund Direct Growth",
   "SBI Flexicap Fund Direct Growth",
   "UTI Flexi Cap Fund Direct Growth",
-  "Franklin India Flexi Cap Fund Direct Growth",
-  "Mirae Asset Flexi Cap Fund Direct Growth",
-
-  // ELSS (Tax Saving)
   "Mirae Asset Tax Saver Fund Direct Growth",
   "Axis Long Term Equity Fund Direct Growth",
   "Quant Tax Plan Direct Growth",
-  "Canara Robeco Equity Tax Saver Fund Direct Growth",
   "DSP Tax Saver Fund Direct Growth",
   "Kotak Tax Saver Fund Direct Growth",
   "HDFC Taxsaver Fund Direct Growth",
   "SBI Long Term Equity Fund Direct Growth",
-  "Nippon India Tax Saver ELSS Fund Direct Growth",
-  "Franklin India Taxshield Fund Direct Growth",
-  "ICICI Prudential Long Term Equity Fund Direct Growth",
-
-  // Index Funds
   "UTI Nifty 50 Index Fund Direct Growth",
   "HDFC Index Fund Nifty 50 Plan Direct Growth",
   "Nippon India Index Fund Nifty 50 Direct Growth",
   "Motilal Oswal Nifty 50 Index Fund Direct Growth",
   "SBI Nifty Index Fund Direct Growth",
-  "ICICI Prudential Nifty 50 Index Fund Direct Growth",
-  "Tata Nifty 50 Index Fund Direct Growth",
-  "DSP Nifty 50 Index Fund Direct Growth",
   "UTI Nifty Next 50 Index Fund Direct Growth",
-  "Motilal Oswal Nifty Next 50 Index Fund Direct Growth",
-  "HDFC Index Fund Nifty Next 50 Direct Growth",
-  "UTI Nifty 200 Momentum 30 Index Fund Direct Growth",
   "Motilal Oswal S&P 500 Index Fund Direct Growth",
-  "Mirae Asset NYSE FANG+ ETF Fund of Fund Direct Growth",
-  "Edelweiss Greater China Equity Off-shore Fund Direct Growth",
-
-  // Sector Funds
   "Tata Digital India Fund Direct Growth",
   "ICICI Prudential Technology Fund Direct Growth",
-  "Nippon India ETF Nifty IT Index",
   "SBI Technology Opportunities Fund Direct Growth",
-  "Franklin India Technology Fund Direct Growth",
   "HDFC Banking and Financial Services Fund Direct Growth",
   "Nippon India Banking & Financial Services Fund Direct Growth",
-  "Tata Banking and Financial Services Fund Direct Growth",
-  "SBI Banking & Financial Services Fund Direct Growth",
   "Mirae Asset Healthcare Fund Direct Growth",
   "Nippon India Pharma Fund Direct Growth",
-  "SBI Healthcare Opportunities Fund Direct Growth",
-  "ICICI Prudential Pharma Healthcare & Diagnostics Fund Direct Growth",
   "Nippon India Power & Infra Fund Direct Growth",
   "Tata Infrastructure Fund Direct Growth",
-  "Canara Robeco Infrastructure Fund Direct Growth",
-
-  // Balanced / Hybrid
   "HDFC Balanced Advantage Fund Direct Growth",
   "ICICI Prudential Balanced Advantage Fund Direct Growth",
   "Kotak Balanced Advantage Fund Direct Growth",
   "Edelweiss Balanced Advantage Fund Direct Growth",
-  "DSP Dynamic Asset Allocation Fund Direct Growth",
-  "Axis Balanced Advantage Fund Direct Growth",
-  "Nippon India Balanced Advantage Fund Direct Growth",
   "SBI Balanced Advantage Fund Direct Growth",
   "HDFC Hybrid Equity Fund Direct Growth",
   "SBI Equity Hybrid Fund Direct Growth",
   "Canara Robeco Equity Hybrid Fund Direct Growth",
   "Mirae Asset Hybrid Equity Fund Direct Growth",
-  "Kotak Equity Hybrid Fund Direct Growth",
-
-  // Aggressive Hybrid
-  "Quant Absolute Fund Direct Growth",
-  "DSP Equity & Bond Fund Direct Growth",
-  "Franklin India Equity Hybrid Fund Direct Growth",
-  "Parag Parikh Conservative Hybrid Fund Direct Growth",
-
-  // Gold Funds
   "Nippon India Gold Savings Fund Direct Growth",
   "HDFC Gold Fund Direct Growth",
   "SBI Gold Fund Direct Growth",
   "Kotak Gold Fund Direct Growth",
-  "Axis Gold Fund Direct Growth",
-  "ICICI Prudential Regular Gold Savings Fund Direct Growth",
-  "Aditya Birla Sun Life Gold Fund Direct Growth",
 ]
 
 function BottomNav({ active = "Portfolio" }) {
@@ -390,16 +280,11 @@ function AddStockModal({ onClose, onAdd }) {
       <div className="relative w-full max-w-md rounded-t-3xl border-t border-[#1f2937] bg-[#111827] p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-50">Add Stock</h2>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1f2937] text-gray-500"
-          >
+          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1f2937] text-gray-500">
             <X className="h-4 w-4" />
           </button>
         </div>
-
         <div className="flex flex-col gap-3">
-          {/* Stock Symbol with Autocomplete */}
           <div className="relative">
             <label className="text-xs text-gray-500 mb-1 block">Stock Symbol</label>
             <div className="relative">
@@ -418,13 +303,9 @@ function AddStockModal({ onClose, onAdd }) {
                   <button
                     key={i}
                     onClick={() => selectStock(stock)}
-                    className={`w-full px-4 py-2.5 text-left hover:bg-[#1f2937] ${
-                      i !== 0 ? "border-t border-[#1f2937]" : ""
-                    }`}
+                    className={`w-full px-4 py-2.5 text-left hover:bg-[#1f2937] ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
                   >
-                    <span className="font-mono text-sm font-semibold text-gray-50">
-                      {stock.symbol}
-                    </span>
+                    <span className="font-mono text-sm font-semibold text-gray-50">{stock.symbol}</span>
                     <span className="ml-2 text-xs text-gray-500">{stock.name}</span>
                   </button>
                 ))}
@@ -473,9 +354,7 @@ function AddStockModal({ onClose, onAdd }) {
                   key={type}
                   onClick={() => setForm({ ...form, holding_type: type })}
                   className={`flex-1 rounded-xl py-2.5 text-sm font-medium uppercase transition-colors ${
-                    form.holding_type === type
-                      ? "bg-blue-500 text-white"
-                      : "border border-[#1f2937] text-gray-500"
+                    form.holding_type === type ? "bg-blue-500 text-white" : "border border-[#1f2937] text-gray-500"
                   }`}
                 >
                   {type}
@@ -567,16 +446,11 @@ function AddSIPModal({ onClose, onAdd }) {
       <div className="relative w-full max-w-md rounded-t-3xl border-t border-[#1f2937] bg-[#111827] p-6 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold text-gray-50">Add SIP</h2>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1f2937] text-gray-500"
-          >
+          <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1f2937] text-gray-500">
             <X className="h-4 w-4" />
           </button>
         </div>
-
         <div className="flex flex-col gap-3">
-          {/* Fund Name with Autocomplete */}
           <div className="relative">
             <label className="text-xs text-gray-500 mb-1 block">Fund Name</label>
             <div className="relative">
@@ -595,9 +469,7 @@ function AddSIPModal({ onClose, onAdd }) {
                   <button
                     key={i}
                     onClick={() => selectFund(fund)}
-                    className={`w-full px-4 py-2.5 text-left text-sm text-gray-50 hover:bg-[#1f2937] ${
-                      i !== 0 ? "border-t border-[#1f2937]" : ""
-                    }`}
+                    className={`w-full px-4 py-2.5 text-left text-sm text-gray-50 hover:bg-[#1f2937] ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
                   >
                     {fund}
                   </button>
@@ -682,26 +554,7 @@ export default function PortfolioPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-md bg-[#0a0f1e] text-gray-50">
-
-      {/* Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#1f2937] bg-[#0a0f1e]/90 px-4 py-3 backdrop-blur-md">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500">
-            <TrendingUp className="h-5 w-5 text-gray-50" />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-gray-50">StockSage</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-[#1f2937]">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-red-500" />
-          </button>
-          <button className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1f2937] text-gray-50">
-            <User className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
-
+      <Header title="Portfolio" />
       <div className="flex flex-col gap-5 px-4 pb-28 pt-4">
 
         {/* Portfolio Summary */}
@@ -764,7 +617,6 @@ export default function PortfolioPage() {
               Add Stock
             </button>
           </div>
-
           {holdings.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-[#1f2937] bg-[#111827] py-10">
               <p className="text-sm text-gray-500">No holdings yet</p>
@@ -781,9 +633,7 @@ export default function PortfolioPage() {
               {holdings.map((h, i) => (
                 <div
                   key={h.id}
-                  className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[#1f2937] transition-colors ${
-                    i !== 0 ? "border-t border-[#1f2937]" : ""
-                  }`}
+                  className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[#1f2937] transition-colors ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold text-gray-50">{h.symbol}</p>
@@ -824,7 +674,6 @@ export default function PortfolioPage() {
               Add SIP
             </button>
           </div>
-
           {sips.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-2xl border border-[#1f2937] bg-[#111827] py-10">
               <p className="text-sm text-gray-500">No SIPs yet</p>
@@ -841,9 +690,7 @@ export default function PortfolioPage() {
               {sips.map((sip, i) => (
                 <div
                   key={sip.id}
-                  className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[#1f2937] transition-colors ${
-                    i !== 0 ? "border-t border-[#1f2937]" : ""
-                  }`}
+                  className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[#1f2937] transition-colors ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-50">{sip.fund_name}</p>
@@ -865,12 +712,8 @@ export default function PortfolioPage() {
 
       </div>
 
-      {showAddStock && (
-        <AddStockModal onClose={() => setShowAddStock(false)} onAdd={fetchPortfolio} />
-      )}
-      {showAddSIP && (
-        <AddSIPModal onClose={() => setShowAddSIP(false)} onAdd={fetchPortfolio} />
-      )}
+      {showAddStock && <AddStockModal onClose={() => setShowAddStock(false)} onAdd={fetchPortfolio} />}
+      {showAddSIP && <AddSIPModal onClose={() => setShowAddSIP(false)} onAdd={fetchPortfolio} />}
 
       <BottomNav active="Portfolio" />
     </main>

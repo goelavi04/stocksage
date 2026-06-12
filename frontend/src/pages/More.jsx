@@ -237,9 +237,12 @@ export default function MorePage() {
 
         {/* About */}
         <section className="rounded-2xl border border-[#1f2937] bg-[#111827] p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Info className="h-4 w-4 text-blue-500" />
-            <h2 className="text-base font-bold text-gray-50">About StockSage</h2>
+          <div className="flex items-center gap-3 mb-3">
+            <img src="/icon-192.png" alt="StockSage" className="h-10 w-10 rounded-xl object-cover" />
+            <div>
+              <h2 className="text-base font-bold text-gray-50">StockSage</h2>
+              <p className="text-[10px] text-gray-500 tracking-widest">AI · INVEST · LEARN</p>
+            </div>
           </div>
           <div className="space-y-2.5">
             {[

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { Bell, TrendingUp, X, CheckCheck } from "lucide-react"
+import { Bell, X, CheckCheck } from "lucide-react"
 import axios from "axios"
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
@@ -80,9 +80,7 @@ export default function Header({ title = "StockSage" }) {
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#1f2937] bg-[#0a0f1e]/90 px-4 py-3 backdrop-blur-md">
       {/* Logo */}
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500">
-          <TrendingUp className="h-5 w-5 text-gray-50" />
-        </div>
+        <img src="/icon-192.png" alt="StockSage" className="h-8 w-8 rounded-lg object-cover" />
         <span className="text-lg font-bold tracking-tight text-gray-50">{title}</span>
       </div>
 

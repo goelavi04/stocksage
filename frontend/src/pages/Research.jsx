@@ -4,8 +4,6 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   Search,
   X,
   LineChart,
@@ -18,6 +16,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   MessageCircle,
   MoreHorizontal,
 } from "lucide-react"
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
 const RECENT_SEARCHES = ["TCS", "RELIANCE", "HDFCBANK", "INFY"]
 const PERIODS = ["1D", "1W", "1M", "3M", "1Y", "5Y"]

@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import Header from "../components/layout/Header"
 import {
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   ArrowDownRight,
   ArrowUpRight,
   ChevronRight,
@@ -19,6 +17,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   MoreHorizontal,
   Loader2,
 } from "lucide-react"
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
 const INDICES = [
   { name: "NIFTY 50", value: "24,500", change: "+0.32%", positive: true },

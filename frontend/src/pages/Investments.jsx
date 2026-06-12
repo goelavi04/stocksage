@@ -3,8 +3,6 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   TrendingUp,
   LayoutDashboard,
   Briefcase,
@@ -13,6 +11,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   Calculator,
   Loader2,
 } from "lucide-react"
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },

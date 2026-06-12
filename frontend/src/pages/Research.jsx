@@ -4,6 +4,8 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   Search,
   X,
   LineChart,
@@ -172,11 +174,11 @@ export default function ResearchPage() {
     setAiAnalysis("")
     try {
       const [quoteRes, indRes, fundRes, recRes, newsRes] = await Promise.all([
-        axios.get(`http://127.0.0.1:8000/stock/${sym}`),
-        axios.get(`http://127.0.0.1:8000/stock/${sym}/indicators`),
-        axios.get(`http://127.0.0.1:8000/stock/${sym}/fundamentals`),
-        axios.get(`http://127.0.0.1:8000/stock/${sym}/recommend`),
-        axios.get(`http://127.0.0.1:8000/news/stock/${sym}`),
+        axios.get(`${API_URL}/stock/${sym}`),
+        axios.get(`${API_URL}/stock/${sym}/indicators`),
+        axios.get(`${API_URL}/stock/${sym}/fundamentals`),
+        axios.get(`${API_URL}/stock/${sym}/recommend`),
+        axios.get(`${API_URL}/news/stock/${sym}`),
       ])
       setQuote(quoteRes.data)
       setIndicators(indRes.data)
@@ -194,7 +196,7 @@ export default function ResearchPage() {
     try {
       setChartData([])
       const res = await axios.get(
-        `http://127.0.0.1:8000/stock/${sym}/history?period=${PERIOD_MAP[period]}`
+        `${API_URL}/stock/${sym}/history?period=${PERIOD_MAP[period]}`
       )
       const data = res.data.data.map((item) => ({ time: item.date, value: item.close }))
       setChartData(data)
@@ -225,7 +227,7 @@ export default function ResearchPage() {
   const generateAnalysis = async () => {
     setAiState("loading")
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/chat/analyse/${symbol}`, { timeout: 60000 })
+      const res = await axios.get(`${API_URL}/chat/analyse/${symbol}`, { timeout: 60000 })
       setAiAnalysis(res.data.analysis)
       setAiState("done")
     } catch (error) {

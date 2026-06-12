@@ -3,6 +3,8 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   TrendingUp,
   LayoutDashboard,
   Briefcase,
@@ -63,7 +65,7 @@ export default function InvestmentsPage() {
     setSipLoading(true)
     try {
       const res = await axios.get(
-        `http://127.0.0.1:8000/recommend/sip/calculate`,
+        `${API_URL}/recommend/sip/calculate`,
         { params: { monthly_amount: monthlyAmount, annual_return: returnRate, years } }
       )
       setSipResult(res.data)
@@ -78,10 +80,10 @@ export default function InvestmentsPage() {
     setRecsLoading(true)
     try {
       const [stockRes, sipRes] = await Promise.all([
-        axios.get(`http://127.0.0.1:8000/recommend/stocks`, {
+        axios.get(`${API_URL}/recommend/stocks`, {
           params: { budget, risk_level: riskLevel }
         }),
-        axios.get(`http://127.0.0.1:8000/recommend/sips`, {
+        axios.get(`${API_URL}/recommend/sips`, {
           params: { monthly_budget: monthlyAmount, risk_level: riskLevel, investment_years: years }
         }),
       ])

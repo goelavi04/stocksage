@@ -3,6 +3,8 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   Send,
   Sparkles,
   Loader2,
@@ -96,7 +98,7 @@ export default function ChatPage() {
       }))
 
       const res = await axios.post(
-        "http://127.0.0.1:8000/chat/message",
+        `${API_URL}/chat/message`,
         { message, father_mode: false, history },
         { timeout: 60000 }
       )

@@ -3,6 +3,8 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   TrendingUp,
   LayoutDashboard,
   Briefcase,
@@ -69,7 +71,7 @@ export default function MorePage() {
   const fetchNews = async () => {
     setNewsLoading(true)
     try {
-      const res = await axios.get("http://127.0.0.1:8000/news/market")
+      const res = await axios.get(`${API_URL}/news/market`)
       setNews(res.data.articles || [])
     } catch (e) {
       console.error(e)

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"
 import { Bell, TrendingUp, X, CheckCheck } from "lucide-react"
 import axios from "axios"
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
+
 const SEVERITY_STYLES = {
   HIGH: "border-l-red-500",
   MEDIUM: "border-l-amber-500",
@@ -43,7 +45,7 @@ export default function Header({ title = "StockSage" }) {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/alerts/notifications")
+      const res = await axios.get(`${API_URL}/alerts/notifications`)
       const notifs = res.data.notifications || []
       setNotifications(notifs)
       setUnreadCount(notifs.filter((n) => !n.is_read).length)
@@ -54,7 +56,7 @@ export default function Header({ title = "StockSage" }) {
 
   const markAllRead = async () => {
     try {
-      await axios.put("http://127.0.0.1:8000/alerts/notifications/read-all")
+      await axios.put(`${API_URL}/alerts/notifications/read-all`)
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
       setUnreadCount(0)
     } catch (e) {
@@ -64,7 +66,7 @@ export default function Header({ title = "StockSage" }) {
 
   const markRead = async (id) => {
     try {
-      await axios.put(`http://127.0.0.1:8000/alerts/notifications/${id}/read`)
+      await axios.put(`${API_URL}/alerts/notifications/${id}/read`)
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
       )

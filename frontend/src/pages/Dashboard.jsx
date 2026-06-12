@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import Header from "../components/layout/Header"
 import {
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   ArrowDownRight,
   ArrowUpRight,
   ChevronRight,
@@ -90,7 +92,7 @@ export default function DashboardPage() {
 
   const fetchPortfolio = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/portfolio/")
+      const res = await axios.get(`${API_URL}/portfolio/`)
       setPortfolio(res.data)
     } catch (e) {
       console.error("Portfolio fetch error:", e)
@@ -101,7 +103,7 @@ export default function DashboardPage() {
 
   const fetchNews = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/news/market")
+      const res = await axios.get(`${API_URL}/news/market`)
       setNews(res.data.articles?.slice(0, 3) || [])
     } catch (e) {
       console.error("News fetch error:", e)
@@ -113,7 +115,7 @@ export default function DashboardPage() {
   const fetchBriefing = async () => {
     setBriefingLoading(true)
     try {
-      const res = await axios.get("http://127.0.0.1:8000/chat/briefing?father_mode=false")
+      const res = await axios.get(`${API_URL}/chat/briefing?father_mode=false`)
       setBriefing(res.data.briefing || res.data.message)
     } catch (e) {
       console.error("Briefing fetch error:", e)

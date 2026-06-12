@@ -3,6 +3,8 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   Plus,
   ChevronRight,
   TrendingUp,
@@ -255,7 +257,7 @@ function AddStockModal({ onClose, onAdd }) {
     if (!form.symbol || !form.quantity || !form.buy_price) return
     setLoading(true)
     try {
-      await axios.post("http://127.0.0.1:8000/portfolio/add", {
+      await axios.post(`${API_URL}/portfolio/add`, {
         symbol: form.symbol.toUpperCase(),
         quantity: parseFloat(form.quantity),
         buy_price: parseFloat(form.buy_price),
@@ -423,7 +425,7 @@ function AddSIPModal({ onClose, onAdd }) {
     if (!form.fund_name || !form.monthly_amount) return
     setLoading(true)
     try {
-      await axios.post("http://127.0.0.1:8000/portfolio/sip/add", {
+      await axios.post(`${API_URL}/portfolio/sip/add`, {
         fund_name: form.fund_name,
         monthly_amount: parseFloat(form.monthly_amount),
         start_date: form.start_date
@@ -535,7 +537,7 @@ export default function PortfolioPage() {
 
   const fetchPortfolio = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/portfolio/")
+      const res = await axios.get(`${API_URL}/portfolio/`)
       setPortfolio(res.data)
     } catch (e) {
       console.error("Failed to fetch portfolio:", e)

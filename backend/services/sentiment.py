@@ -1,28 +1,24 @@
 from transformers import pipeline, AutoTokenizer, AutoModelForSequenceClassification
 import torch
 
-# ── Load FinBERT Model ────────────────────────────────
-# This downloads the model first time (~440MB)
-# After that it's cached on your PC forever
-# No internet needed after first download
-
-print("Loading FinBERT model... (first time takes 2-3 minutes)")
-
 MODEL_NAME = "ProsusAI/finbert"
+_sentiment_pipeline = None
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
-model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
 
-# Create sentiment pipeline
-# Pipeline = a ready to use AI tool that handles everything automatically
-sentiment_pipeline = pipeline(
-    "text-classification",
-    model=model,
-    tokenizer=tokenizer,
-    device=-1  # -1 = CPU, 0 = GPU (we use CPU)
-)
-
-print("FinBERT model loaded successfully ✅")
+def _get_pipeline():
+    global _sentiment_pipeline
+    if _sentiment_pipeline is None:
+        print("Loading FinBERT model... (first time takes 2-3 minutes)")
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+        model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+        _sentiment_pipeline = pipeline(
+            "text-classification",
+            model=model,
+            tokenizer=tokenizer,
+            device=-1,
+        )
+        print("FinBERT model loaded successfully")
+    return _sentiment_pipeline
 
 
 def analyse_sentiment(text: str) -> dict:
@@ -40,7 +36,7 @@ def analyse_sentiment(text: str) -> dict:
         # FinBERT has a 512 token limit
         text = text[:512]
 
-        result = sentiment_pipeline(text)[0]
+        result = _get_pipeline()(text)[0]
 
         label = result["label"].lower()
         confidence = round(result["score"], 4)

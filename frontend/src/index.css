@@ -9,6 +9,8 @@
     background-color: #0A0F1E;
     color: #F9FAFB;
     font-family: 'Inter', system-ui, sans-serif;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 

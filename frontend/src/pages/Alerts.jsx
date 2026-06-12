@@ -3,6 +3,8 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
   TrendingUp,
   LayoutDashboard,
   Briefcase,
@@ -70,8 +72,8 @@ export default function AlertsPage() {
   const fetchData = async () => {
     try {
       const [notifRes, statusRes] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/alerts/notifications"),
-        axios.get("http://127.0.0.1:8000/alerts/market-status"),
+        axios.get(`${API_URL}/alerts/notifications`),
+        axios.get(`${API_URL}/alerts/market-status`),
       ])
       setNotifications(notifRes.data.notifications || [])
       setMarketStatus(statusRes.data)
@@ -88,7 +90,7 @@ export default function AlertsPage() {
 
   const markAllRead = async () => {
     try {
-      await axios.put("http://127.0.0.1:8000/alerts/notifications/read-all")
+      await axios.put(`${API_URL}/alerts/notifications/read-all`)
       setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
     } catch (e) {
       console.error(e)
@@ -98,7 +100,7 @@ export default function AlertsPage() {
   const checkAlerts = async () => {
     setChecking(true)
     try {
-      await axios.get("http://127.0.0.1:8000/alerts/check")
+      await axios.get(`${API_URL}/alerts/check`)
       await fetchData()
     } catch (e) {
       console.error(e)
@@ -109,7 +111,7 @@ export default function AlertsPage() {
 
   const markRead = async (id) => {
     try {
-      await axios.put(`http://127.0.0.1:8000/alerts/notifications/${id}/read`)
+      await axios.put(`${API_URL}/alerts/notifications/${id}/read`)
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
       )

@@ -31,7 +31,15 @@ app = FastAPI(
 # ── CORS — allows frontend to call backend ──────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://127.0.0.1:5175", "https://stocksage-app.vercel.app", "https://*.vercel.app"],
+    allow_origins=[
+        "http://localhost:5173", "http://localhost:5174", "http://localhost:5175",
+        "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://127.0.0.1:5175",
+        "https://frontend-aviral-goels-projects-b3ad9f58.vercel.app",
+        "https://frontend-goelavi04-aviral-goels-projects-b3ad9f58.vercel.app",
+        "https://frontend-six-xi-f7e07uync5.vercel.app",
+        "https://goelavi04-stocksage-backend.hf.space",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

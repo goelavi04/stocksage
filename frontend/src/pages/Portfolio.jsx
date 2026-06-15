@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom"
 import Header from "../components/layout/Header"
 import {
   Plus,
-  ChevronRight,
   TrendingUp,
   LayoutDashboard,
   Briefcase,
   MessageCircle,
   MoreHorizontal,
   X,
+  Trash2,
   Loader2,
   Search,
 } from "lucide-react"
@@ -534,6 +534,31 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true)
   const [showAddStock, setShowAddStock] = useState(false)
   const [showAddSIP, setShowAddSIP] = useState(false)
+  const [deletingId, setDeletingId] = useState(null)
+
+  const deleteHolding = async (id) => {
+    setDeletingId(id)
+    try {
+      await axios.delete(`${API_URL}/portfolio/${id}`)
+      await fetchPortfolio()
+    } catch (e) {
+      console.error("Failed to delete holding:", e)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  const deleteSIP = async (id) => {
+    setDeletingId(`sip-${id}`)
+    try {
+      await axios.delete(`${API_URL}/portfolio/sip/${id}`)
+      await fetchPortfolio()
+    } catch (e) {
+      console.error("Failed to delete SIP:", e)
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   const fetchPortfolio = async () => {
     try {
@@ -635,7 +660,7 @@ export default function PortfolioPage() {
               {holdings.map((h, i) => (
                 <div
                   key={h.id}
-                  className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[#1f2937] transition-colors ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
+                  className={`flex items-center gap-3 px-4 py-3.5 transition-colors ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold text-gray-50">{h.symbol}</p>
@@ -652,7 +677,15 @@ export default function PortfolioPage() {
                       {h.pnl >= 0 ? "+" : ""}₹{h.pnl} ({h.pnl_percent}%)
                     </p>
                   </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-500" />
+                  <button
+                    onClick={() => deleteHolding(h.id)}
+                    disabled={deletingId === h.id}
+                    className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500 active:bg-red-500/25 disabled:opacity-40"
+                  >
+                    {deletingId === h.id
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : <Trash2 className="h-3.5 w-3.5" />}
+                  </button>
                 </div>
               ))}
             </div>
@@ -692,7 +725,7 @@ export default function PortfolioPage() {
               {sips.map((sip, i) => (
                 <div
                   key={sip.id}
-                  className={`flex items-center gap-3 px-4 py-3.5 hover:bg-[#1f2937] transition-colors ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
+                  className={`flex items-center gap-3 px-4 py-3.5 transition-colors ${i !== 0 ? "border-t border-[#1f2937]" : ""}`}
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-50">{sip.fund_name}</p>
@@ -705,7 +738,15 @@ export default function PortfolioPage() {
                       ₹{sip.monthly_amount?.toLocaleString("en-IN")}/mo
                     </span>
                   </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-gray-500" />
+                  <button
+                    onClick={() => deleteSIP(sip.id)}
+                    disabled={deletingId === `sip-${sip.id}`}
+                    className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500 active:bg-red-500/25 disabled:opacity-40"
+                  >
+                    {deletingId === `sip-${sip.id}`
+                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      : <Trash2 className="h-3.5 w-3.5" />}
+                  </button>
                 </div>
               ))}
             </div>

@@ -10,7 +10,6 @@ import {
   MessageCircle,
   MoreHorizontal,
   X,
-  Trash2,
   Loader2,
   Search,
 } from "lucide-react"
@@ -534,7 +533,7 @@ export default function PortfolioPage() {
   const [loading, setLoading] = useState(true)
   const [showAddStock, setShowAddStock] = useState(false)
   const [showAddSIP, setShowAddSIP] = useState(false)
-  const [deletingId, setDeletingId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null) // BUILDTEST_XYZ789
 
   const deleteHolding = async (id) => {
     setDeletingId(id)
@@ -680,11 +679,9 @@ export default function PortfolioPage() {
                   <button
                     onClick={() => deleteHolding(h.id)}
                     disabled={deletingId === h.id}
-                    className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500 active:bg-red-500/25 disabled:opacity-40"
+                    className="ml-2 shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-500 bg-red-500/10 active:bg-red-500/20 disabled:opacity-40"
                   >
-                    {deletingId === h.id
-                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      : <Trash2 className="h-3.5 w-3.5" />}
+                    {deletingId === h.id ? "..." : "del"}
                   </button>
                 </div>
               ))}
@@ -741,11 +738,9 @@ export default function PortfolioPage() {
                   <button
                     onClick={() => deleteSIP(sip.id)}
                     disabled={deletingId === `sip-${sip.id}`}
-                    className="ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-red-500 active:bg-red-500/25 disabled:opacity-40"
+                    className="ml-2 shrink-0 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-500 bg-red-500/10 active:bg-red-500/20 disabled:opacity-40"
                   >
-                    {deletingId === `sip-${sip.id}`
-                      ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      : <Trash2 className="h-3.5 w-3.5" />}
+                    {deletingId === `sip-${sip.id}` ? "..." : "del"}
                   </button>
                 </div>
               ))}

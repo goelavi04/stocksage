@@ -122,24 +122,32 @@ def generate_recommendation(symbol: str) -> dict:
     """
     # ── Fetch all data ────────────────────────────────────
     indicators   = fetch_technical_indicators(symbol)
-    fundamentals = fetch_fundamental_data(symbol)
-
-    if not indicators or not fundamentals:
+    if not indicators:
         return None
 
+    fundamentals = fetch_fundamental_data(symbol)  # may be None (non-fatal)
+
     # ── Calculate dimension scores ────────────────────────
-    tech_score,  tech_reasons  = calculate_technical_score(indicators)
-    fund_score,  fund_reasons  = calculate_fundamental_score(fundamentals)
+    tech_score, tech_reasons = calculate_technical_score(indicators)
+
+    if fundamentals:
+        fund_score, fund_reasons = calculate_fundamental_score(fundamentals)
+        fund_weight = 0.40
+        tech_weight = 0.40
+    else:
+        fund_score   = 50
+        fund_reasons = ["Fundamental data temporarily unavailable — using neutral score"]
+        fund_weight  = 0.0
+        tech_weight  = 0.80
 
     # ML score defaults to 50 (neutral) until LSTM is built
     ml_score    = 50
     ml_reasons  = ["ML forecast not yet available — defaulting to neutral"]
 
     # ── Weighted final score ──────────────────────────────
-    # Technical 40% + Fundamental 40% + ML 20%
     final_score = round(
-        (tech_score * 0.40) +
-        (fund_score * 0.40) +
+        (tech_score * tech_weight) +
+        (fund_score * fund_weight) +
         (ml_score   * 0.20),
         1
     )
@@ -175,7 +183,7 @@ def generate_recommendation(symbol: str) -> dict:
 
     return {
         "symbol": symbol.upper(),
-        "company_name": fundamentals["company_info"].get("sector", ""),
+        "company_name": (fundamentals or {}).get("company_info", {}).get("sector", ""),
         "current_price": indicators["current_price"],
         "recommendation": {
             "signal": signal,
@@ -212,8 +220,8 @@ def generate_father_mode(
     """
 
     price       = indicators["current_price"]
-    pe          = fundamentals["valuation"]["pe_ratio"]
-    debt_signal = fundamentals["financial_health"]["debt_signal"]
+    pe          = (fundamentals or {}).get("valuation", {}).get("pe_ratio")
+    debt_signal = (fundamentals or {}).get("financial_health", {}).get("debt_signal", "unavailable")
     rsi         = indicators["indicators"]["rsi"]["value"]
 
     # Simple action advice based on signal
@@ -238,11 +246,12 @@ def generate_father_mode(
     debt_simple = "Company par zyada karz nahi hai" if "good" in debt_signal else "Company par thoda karz hai"
     rsi_simple  = "Price thoda neeche aaya hai" if rsi < 45 else "Price upar chal raha hai"
 
+    pe_str = f"PE ratio {pe} hai. " if pe else ""
     explanation = (
         f"{symbol} ka score aaj {score}/100 hai. "
         f"{rsi_simple}. "
         f"{debt_simple}. "
-        f"PE ratio {pe} hai jo theek hai. "
+        f"{pe_str}"
         f"Is waqt recommendation hai: {action}"
     )
 

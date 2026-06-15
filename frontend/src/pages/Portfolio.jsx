@@ -217,7 +217,7 @@ function BottomNav({ active = "Portfolio" }) {
   )
 }
 
-function AddStockModal({ onClose, onAdd }) {
+function AddStockModal({ onClose, onAdd, userId }) {
   const [form, setForm] = useState({
     symbol: "",
     quantity: "",
@@ -257,6 +257,7 @@ function AddStockModal({ onClose, onAdd }) {
     setLoading(true)
     try {
       await axios.post(`${API_URL}/portfolio/add`, {
+        user_id: userId,
         symbol: form.symbol.toUpperCase(),
         quantity: parseFloat(form.quantity),
         buy_price: parseFloat(form.buy_price),
@@ -389,7 +390,7 @@ function AddStockModal({ onClose, onAdd }) {
   )
 }
 
-function AddSIPModal({ onClose, onAdd }) {
+function AddSIPModal({ onClose, onAdd, userId }) {
   const [form, setForm] = useState({
     fund_name: "",
     monthly_amount: "",
@@ -425,6 +426,7 @@ function AddSIPModal({ onClose, onAdd }) {
     setLoading(true)
     try {
       await axios.post(`${API_URL}/portfolio/sip/add`, {
+        user_id: userId,
         fund_name: form.fund_name,
         monthly_amount: parseFloat(form.monthly_amount),
         start_date: form.start_date
@@ -529,11 +531,12 @@ function AddSIPModal({ onClose, onAdd }) {
 }
 
 export default function PortfolioPage() {
+  const userId = localStorage.getItem("ss_uid") || 1
   const [portfolio, setPortfolio] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showAddStock, setShowAddStock] = useState(false)
   const [showAddSIP, setShowAddSIP] = useState(false)
-  const [deletingId, setDeletingId] = useState(null) // BUILDTEST_XYZ789
+  const [deletingId, setDeletingId] = useState(null)
 
   const deleteHolding = async (id) => {
     setDeletingId(id)
@@ -561,7 +564,7 @@ export default function PortfolioPage() {
 
   const fetchPortfolio = async () => {
     try {
-      const res = await axios.get(`${API_URL}/portfolio/`)
+      const res = await axios.get(`${API_URL}/portfolio/?user_id=${userId}`)
       setPortfolio(res.data)
     } catch (e) {
       console.error("Failed to fetch portfolio:", e)
@@ -750,8 +753,8 @@ export default function PortfolioPage() {
 
       </div>
 
-      {showAddStock && <AddStockModal onClose={() => setShowAddStock(false)} onAdd={fetchPortfolio} />}
-      {showAddSIP && <AddSIPModal onClose={() => setShowAddSIP(false)} onAdd={fetchPortfolio} />}
+      {showAddStock && <AddStockModal onClose={() => setShowAddStock(false)} onAdd={fetchPortfolio} userId={userId} />}
+      {showAddSIP && <AddSIPModal onClose={() => setShowAddSIP(false)} onAdd={fetchPortfolio} userId={userId} />}
 
       <BottomNav active="Portfolio" />
     </main>

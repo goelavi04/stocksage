@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Optional
@@ -24,6 +24,7 @@ class AddHolding(BaseModel):
     buy_date: Optional[str] = None
     holding_type: Optional[str] = "stock"
     notes: Optional[str] = None
+    user_id: Optional[int] = 1
 
 
 class AddSIP(BaseModel):
@@ -32,6 +33,7 @@ class AddSIP(BaseModel):
     start_date: Optional[str] = None
     sip_date: Optional[int] = 1
     notes: Optional[str] = None
+    user_id: Optional[int] = 1
 
 
 # ── ADD HOLDING ───────────────────────────────────────
@@ -55,6 +57,7 @@ def add_holding(holding: AddHolding, db: Session = Depends(get_db)):
 
     # Create new portfolio record
     new_holding = Portfolio(
+        user_id=holding.user_id,
         symbol=holding.symbol.upper(),
         company_name=company_name,
         quantity=holding.quantity,
@@ -88,14 +91,12 @@ def add_holding(holding: AddHolding, db: Session = Depends(get_db)):
 
 # ── GET PORTFOLIO ─────────────────────────────────────
 @router.get("/")
-def get_portfolio(db: Session = Depends(get_db)):
+def get_portfolio(user_id: int = Query(1), db: Session = Depends(get_db)):
     """
-    Get your complete portfolio with current prices and P&L.
-    Shows total invested, current value, and profit/loss.
+    Get portfolio for a specific user with current prices and P&L.
     """
-    # Get all holdings from database
-    holdings = db.query(Portfolio).all()
-    sips = db.query(SIP).all()
+    holdings = db.query(Portfolio).filter(Portfolio.user_id == user_id).all()
+    sips = db.query(SIP).filter(SIP.user_id == user_id).all()
 
     if not holdings and not sips:
         return {
@@ -214,6 +215,7 @@ def add_sip(sip: AddSIP, db: Session = Depends(get_db)):
     }
     """
     new_sip = SIP(
+        user_id=sip.user_id,
         fund_name=sip.fund_name,
         monthly_amount=sip.monthly_amount,
         start_date=sip.start_date,
@@ -263,12 +265,11 @@ def delete_sip(sip_id: int, db: Session = Depends(get_db)):
 from backend.services.recommender import generate_recommendation
 
 @router.get("/analyse")
-def analyse_portfolio(db: Session = Depends(get_db)):
+def analyse_portfolio(user_id: int = Query(1), db: Session = Depends(get_db)):
     """
-    Runs Buy/Hold/Sell recommendation on ALL your holdings at once.
-    Gives you a complete portfolio action plan.
+    Runs Buy/Hold/Sell recommendation on a user's holdings.
     """
-    holdings = db.query(Portfolio).all()
+    holdings = db.query(Portfolio).filter(Portfolio.user_id == user_id).all()
 
     if not holdings:
         return {"message": "Portfolio is empty. Add holdings first."}

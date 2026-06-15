@@ -92,7 +92,8 @@ export default function DashboardPage() {
 
   const fetchPortfolio = async () => {
     try {
-      const res = await axios.get(`${API_URL}/portfolio/`)
+      const uid = localStorage.getItem("ss_uid") || 1
+      const res = await axios.get(`${API_URL}/portfolio/?user_id=${uid}`)
       setPortfolio(res.data)
     } catch (e) {
       console.error("Portfolio fetch error:", e)

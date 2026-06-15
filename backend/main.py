@@ -9,19 +9,39 @@ from backend.routes.news import router as news_router
 from backend.routes.alerts import router as alerts_router
 from backend.routes.recommendations import router as recommendations_router
 from backend.routes.chat import router as chat_router
+from backend.routes.users import router as users_router
 from backend.services.scheduler import start_scheduler, stop_scheduler
 from backend.persistence import start_persistence, save_db
+from backend.models.user import User  # noqa: F401 — registers model with Base
+from sqlalchemy import text
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting StockSage API...")
-    start_persistence()                        # load DB from HF, begin 5-min saves
+    start_persistence()
     portfolio_models.Base.metadata.create_all(bind=engine)
+    _migrate()
     start_scheduler()
     yield
     stop_scheduler()
-    save_db()                                  # final save before shutdown
+    save_db()
     print("StockSage API stopped")
+
+
+def _migrate():
+    with engine.connect() as conn:
+        for tbl in ["portfolio", "sips"]:
+            try:
+                conn.execute(text(f"ALTER TABLE {tbl} ADD COLUMN user_id INTEGER DEFAULT 1"))
+                conn.commit()
+                print(f"[migrate] Added user_id to {tbl}")
+            except Exception:
+                pass
+        count = conn.execute(text("SELECT COUNT(*) FROM users")).scalar()
+        if count == 0:
+            conn.execute(text("INSERT INTO users (name, color) VALUES ('Me', '#3b82f6')"))
+            conn.commit()
+            print("[migrate] Created default user")
 
 app = FastAPI(
     title="StockSage API",
@@ -46,6 +66,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(users_router)
 app.include_router(stock_router)
 app.include_router(portfolio_router)
 app.include_router(news_router)

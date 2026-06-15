@@ -1,7 +1,36 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { Bell, X, CheckCheck } from "lucide-react"
+import { Bell, X, CheckCheck, Users } from "lucide-react"
 import axios from "axios"
+
+function getInitials(name) {
+  return (name || "?").trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+}
+
+function currentUser() {
+  return {
+    id: localStorage.getItem("ss_uid"),
+    name: localStorage.getItem("ss_uname") || "Me",
+    photo: localStorage.getItem("ss_uphoto") || "",
+    color: localStorage.getItem("ss_ucolor") || "#3b82f6",
+  }
+}
+
+function UserAvatar({ size = "sm" }) {
+  const user = currentUser()
+  const cls = size === "sm" ? "h-9 w-9 text-sm" : "h-12 w-12 text-lg"
+  if (user.photo) {
+    return <img src={user.photo} alt={user.name} className={`${cls} rounded-full object-cover`} />
+  }
+  return (
+    <div
+      className={`${cls} rounded-full flex items-center justify-center font-bold text-white`}
+      style={{ backgroundColor: user.color }}
+    >
+      {getInitials(user.name)}
+    </div>
+  )
+}
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 
@@ -208,60 +237,36 @@ export default function Header({ title = "StockSage" }) {
         {/* Profile Avatar */}
         <div ref={profileRef} className="relative">
           <button
-            onClick={() => {
-              setShowProfile((v) => !v)
-              setShowNotifications(false)
-            }}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 text-sm font-bold text-white"
+            onClick={() => { setShowProfile((v) => !v); setShowNotifications(false) }}
+            className="overflow-hidden rounded-full"
           >
-            AG
+            <UserAvatar size="sm" />
           </button>
 
           {/* Profile Dropdown */}
           {showProfile && (
-            <div className="absolute right-0 top-11 w-64 rounded-2xl border border-[#1f2937] bg-[#111827] shadow-2xl overflow-hidden z-50">
-              {/* Profile Info */}
+            <div className="absolute right-0 top-11 w-56 rounded-2xl border border-[#1f2937] bg-[#111827] shadow-2xl overflow-hidden z-50">
+              {/* Current user */}
               <div className="px-4 py-4 border-b border-[#1f2937]">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-emerald-500 text-lg font-bold text-white">
-                    AG
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-gray-50">Aviral Goel</p>
-                    <p className="text-xs text-gray-500">KJ Somaiya · AI & DS</p>
-                    <p className="text-xs text-blue-400 mt-0.5">goelavi2311@gmail.com</p>
+                  <UserAvatar size="md" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-50 truncate">{currentUser().name}</p>
+                    <p className="text-xs text-gray-500">Active profile</p>
                   </div>
                 </div>
               </div>
 
-              {/* Portfolio Quick Stats */}
-              <div className="px-4 py-3 border-b border-[#1f2937]">
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-2">Portfolio</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <p className="text-[10px] text-gray-500">Holdings</p>
-                    <p className="font-mono text-sm font-semibold text-gray-50">3 stocks</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500">SIPs</p>
-                    <p className="font-mono text-sm font-semibold text-gray-50">4 active</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Links */}
+              {/* Quick links */}
               <div className="px-4 py-3 border-b border-[#1f2937]">
                 {[
-                  { label: "View Portfolio", path: "/portfolio" },
-                  { label: "Check Alerts", path: "/alerts" },
+                  { label: "My Portfolio", path: "/portfolio" },
+                  { label: "Alerts", path: "/alerts" },
                   { label: "AI Chat", path: "/chat" },
                 ].map((item) => (
                   <button
                     key={item.label}
-                    onClick={() => {
-                      setShowProfile(false)
-                      navigate(item.path)
-                    }}
+                    onClick={() => { setShowProfile(false); navigate(item.path) }}
                     className="w-full text-left py-1.5 text-sm text-gray-400 hover:text-gray-50 transition-colors"
                   >
                     {item.label}
@@ -269,14 +274,15 @@ export default function Header({ title = "StockSage" }) {
                 ))}
               </div>
 
-              {/* App Info */}
+              {/* Switch profile */}
               <div className="px-4 py-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">StockSage v2.0</span>
-                  <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 font-mono text-[10px] text-emerald-500">
-                    LIVE
-                  </span>
-                </div>
+                <button
+                  onClick={() => { setShowProfile(false); navigate("/profiles") }}
+                  className="flex items-center gap-2 w-full text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  <Users className="h-4 w-4" />
+                  Switch Profile
+                </button>
               </div>
             </div>
           )}

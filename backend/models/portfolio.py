@@ -16,6 +16,7 @@ class Portfolio(Base):
     __tablename__ = "portfolio"
 
     id               = Column(Integer, primary_key=True, autoincrement=True)
+    user_id          = Column(Integer, default=1)
     symbol           = Column(String, nullable=False)
     company_name     = Column(String, nullable=True)
     holding_type     = Column(String, default="stock")
@@ -32,6 +33,7 @@ class SIP(Base):
     __tablename__ = "sips"
 
     id              = Column(Integer, primary_key=True, autoincrement=True)
+    user_id         = Column(Integer, default=1)
     fund_name       = Column(String, nullable=False)
     monthly_amount  = Column(Float, nullable=False)
     start_date      = Column(String, nullable=True)

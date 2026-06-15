@@ -34,6 +34,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173", "http://localhost:5174", "http://localhost:5175",
         "http://127.0.0.1:5173", "http://127.0.0.1:5174", "http://127.0.0.1:5175",
+        "https://stocksage.app",
+        "https://www.stocksage.app",
         "https://frontend-aviral-goels-projects-b3ad9f58.vercel.app",
         "https://frontend-goelavi04-aviral-goels-projects-b3ad9f58.vercel.app",
         "https://frontend-six-xi-f7e07uync5.vercel.app",

@@ -10,15 +10,17 @@ from backend.routes.alerts import router as alerts_router
 from backend.routes.recommendations import router as recommendations_router
 from backend.routes.chat import router as chat_router
 from backend.services.scheduler import start_scheduler, stop_scheduler
-
-portfolio_models.Base.metadata.create_all(bind=engine)
+from backend.persistence import start_persistence, save_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting StockSage API...")
+    start_persistence()                        # load DB from HF, begin 5-min saves
+    portfolio_models.Base.metadata.create_all(bind=engine)
     start_scheduler()
     yield
     stop_scheduler()
+    save_db()                                  # final save before shutdown
     print("StockSage API stopped")
 
 app = FastAPI(

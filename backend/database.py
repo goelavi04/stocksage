@@ -4,9 +4,9 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # ── Database Configuration ────────────────────────────
-# SQLite stores everything in a single file — stocksage.db
-# This file will be created automatically in your project folder
-DATABASE_URL = "sqlite:///./stocksage.db"
+# Use /tmp/stocksage.db so persistence.py can manage load/save
+# to a HuggingFace dataset for free cross-restart persistence.
+DATABASE_URL = "sqlite:////tmp/stocksage.db"
 
 # ── Create Engine ─────────────────────────────────────
 # Engine = the connection between Python and the database

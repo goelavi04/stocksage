@@ -5,6 +5,7 @@ from typing import Optional
 from backend.database import get_db
 from backend.models.portfolio import Portfolio, SIP
 from backend.services.data_fetcher import fetch_stock_quote
+from backend.persistence import save_db
 
 router = APIRouter(
     prefix="/portfolio",
@@ -68,6 +69,7 @@ def add_holding(holding: AddHolding, db: Session = Depends(get_db)):
     db.add(new_holding)
     db.commit()
     db.refresh(new_holding)
+    save_db()
 
     return {
         "message": f"{holding.symbol.upper()} added to portfolio successfully",
@@ -190,6 +192,7 @@ def delete_holding(holding_id: int, db: Session = Depends(get_db)):
 
     db.delete(holding)
     db.commit()
+    save_db()
 
     return {
         "message": f"{holding.symbol} removed from portfolio successfully"
@@ -221,6 +224,7 @@ def add_sip(sip: AddSIP, db: Session = Depends(get_db)):
     db.add(new_sip)
     db.commit()
     db.refresh(new_sip)
+    save_db()
 
     return {
         "message": f"SIP for {sip.fund_name} added successfully",
@@ -251,6 +255,7 @@ def delete_sip(sip_id: int, db: Session = Depends(get_db)):
 
     db.delete(sip)
     db.commit()
+    save_db()
 
     return {
         "message": f"{sip.fund_name} SIP removed successfully"

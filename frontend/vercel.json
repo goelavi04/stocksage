@@ -1,3 +1,4 @@
 {
-  "alias": ["stocksage.vercel.app"]
+  "alias": ["stocksage.vercel.app"],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

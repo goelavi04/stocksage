@@ -12,7 +12,7 @@ app_port: 7860
 
 > An AI-powered Indian stock market platform for retail investors — built to help families track portfolios, research stocks, and get plain-language investment advice.
 
-**Live App:** [stocksage.vercel.app]((https://stocksage.vercel.app/dashboard)) &nbsp;|&nbsp; **API:** [goelavi04-stocksage-backend.hf.space](https://goelavi04-stocksage-backend.hf.space)
+**Live App:**((https://stocksage.vercel.app/dashboard)) &nbsp;|&nbsp; **API:** [goelavi04-stocksage-backend.hf.space](https://goelavi04-stocksage-backend.hf.space)
 
 ---
 
